@@ -17,14 +17,16 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Parse Issue Body for App Name
+      - name: Parse Issue Details for App Name and Unique ID
         id: parse_issue
         run: |
           echo "app_name=$(echo "${{ github.event.issue.body }}" | grep 'app_name' | cut -d ':' -f2 | xargs)" >> $GITHUB_ENV
+          echo "unique_id=$(echo "${{ github.event.issue.number }}-$(date +%s))" >> $GITHUB_ENV
+          echo "resource_group_name=env-${{ env.app_name }}-${{ env.unique_id }}-rg" >> $GITHUB_ENV
 
       - name: Delete Resource Group
         run: |
-          az group delete --name "${{ env.app_name }}-rg" --yes --no-wait
+          az group delete --name "${{ env.resource_group_name }}" --yes --no-wait
 
       - name: Comment on Issue with Cleanup Confirmation
         run: |
