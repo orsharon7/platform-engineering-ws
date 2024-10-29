@@ -20,9 +20,9 @@ jobs:
       - name: Parse Issue Details
         id: parse_issue
         run: |
-          # Extract app_name and region directly from the form-based issue body fields
-          app_name="${{ github.event.issue.body.app_name }}"
-          region="${{ github.event.issue.body.region }}"
+          # Extract app_name and region from the issue body text
+          app_name=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Application Name:\*\* ).*')
+          region=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Azure Region:\*\* ).*')
           
           # Generate unique ID based on issue number and timestamp
           unique_id="${{ github.event.issue.number }}-$(date +%s)"
