@@ -20,10 +20,23 @@ jobs:
       - name: Parse Issue Details
         id: parse_issue
         run: |
-          echo "app_name=$(echo "${{ github.event.issue.body }}" | grep 'app_name' | cut -d ':' -f2 | xargs)" >> $GITHUB_ENV
-          echo "region=$(echo "${{ github.event.issue.body }}" | grep 'Region' | cut -d ':' -f2 | xargs)" >> $GITHUB_ENV
-          echo "unique_id=$(echo "${{ github.event.issue.number }}-$(date +%s))" >> $GITHUB_ENV  # Unique string based on Issue ID and timestamp
-          echo "resource_group_name=env-${{ env.app_name }}-${{ env.unique_id }}-rg" >> $GITHUB_ENV
+          # Extract application name and region
+          app_name=$(echo "${{ github.event.issue.body }}" | sed -n 's/.*`app_name`:\s*\(.*\)/\1/p' | xargs)
+          region=$(echo "${{ github.event.issue.body }}" | sed -n 's/.*Region:\s*\(.*\)/\1/p' | xargs)
+          
+          # Generate unique ID based on issue number and timestamp
+          unique_id="${{ github.event.issue.number }}-$(date +%s)"
+          
+          # Set environment variables if values are extracted successfully
+          if [[ -n "$app_name" && -n "$region" ]]; then
+            echo "app_name=$app_name" >> $GITHUB_ENV
+            echo "region=$region" >> $GITHUB_ENV
+            echo "unique_id=$unique_id" >> $GITHUB_ENV
+            echo "resource_group_name=env-$app_name-$unique_id-rg" >> $GITHUB_ENV
+          else
+            echo "Error: Failed to parse issue details." >&2
+            exit 1
+          fi
 
       - name: Create Resource Group with Tags
         run: |
