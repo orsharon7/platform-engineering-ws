@@ -9,7 +9,6 @@ body:
       label: "Application Name"
       description: "Provide the application name to use for your environment"
       placeholder: "e.g., my-app"
-      required: true
 
   - type: dropdown
     id: region
@@ -21,7 +20,6 @@ body:
         - westeurope
         - southeastasia
         - centralus
-      required: true
 
   - type: textarea
     id: additional_notes
