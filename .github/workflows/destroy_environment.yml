@@ -1,0 +1,33 @@
+name: Destroy Environment on Issue Close
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if issue is an environment request
+        if: contains(github.event.issue.labels.*.name, 'environment-request')
+        run: echo "Environment request detected for closure"
+
+      - name: Set up Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Parse Issue Body
+        id: parse_issue
+        run: |
+          echo "app_name=$(echo "${{ github.event.issue.body }}" | grep 'app_name' | cut -d ':' -f2 | xargs)" >> $GITHUB_ENV
+
+      - name: Delete Resource Group
+        run: |
+          az group delete --name ${{ env.app_name }}-rg --yes --no-wait
+
+      - name: Comment on Issue with Cleanup Confirmation
+        run: |
+          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"body": "Environment for `${{ env.app_name }}` has been successfully cleaned up."}' \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
