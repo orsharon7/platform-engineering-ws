@@ -11,7 +11,6 @@ assignees: ''
 
 ### Environment Specifications
 - Region: <select your Azure region, e.g., `eastus`, `westeurope`>
-- Instance Type: <provide instance type, e.g., Standard_B1s>
 
 ### Any Additional Notes
 - Add any specific requirements or notes here.
