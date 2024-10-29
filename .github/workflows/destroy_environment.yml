@@ -12,19 +12,19 @@ jobs:
         if: contains(github.event.issue.labels.*.name, 'environment-request')
         run: echo "Environment request detected for closure"
 
-      - name: Set up Azure CLI
-        uses: azure/login@v1
+      - name: Set up Azure CLI with Azure Login v2
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Parse Issue Body
+      - name: Parse Issue Body for App Name
         id: parse_issue
         run: |
           echo "app_name=$(echo "${{ github.event.issue.body }}" | grep 'app_name' | cut -d ':' -f2 | xargs)" >> $GITHUB_ENV
 
       - name: Delete Resource Group
         run: |
-          az group delete --name ${{ env.app_name }}-rg --yes --no-wait
+          az group delete --name "${{ env.app_name }}-rg" --yes --no-wait
 
       - name: Comment on Issue with Cleanup Confirmation
         run: |
