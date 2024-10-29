@@ -20,9 +20,9 @@ jobs:
       - name: Parse Issue Details
         id: parse_issue
         run: |
-          # Extract application name and region
-          app_name=$(echo "${{ github.event.issue.body }}" | sed -n 's/.*`app_name`:\s*\(.*\)/\1/p' | xargs)
-          region=$(echo "${{ github.event.issue.body }}" | sed -n 's/.*Region:\s*\(.*\)/\1/p' | xargs)
+          # Extract application name and region using grep and cut
+          app_name=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=`app_name`:\s).+' | xargs)
+          region=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Region:\s).+' | xargs)
           
           # Generate unique ID based on issue number and timestamp
           unique_id="${{ github.event.issue.number }}-$(date +%s)"
@@ -37,7 +37,7 @@ jobs:
             echo "Error: Failed to parse issue details." >&2
             exit 1
           fi
-
+  
       - name: Create Resource Group with Tags
         run: |
           az group create --name "${{ env.resource_group_name }}" --location "${{ env.region }}" \
