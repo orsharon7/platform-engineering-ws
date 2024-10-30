@@ -13,14 +13,14 @@ body:
   - type: input
     id: app_name
     attributes:
-      label: "Application Name"
-      description: "Provide the name of the application to use for this environment."
+      label: ">>>app_name<<<"
+      description: "Provide the name of the application for this environment."
       placeholder: "e.g., my-app"
 
   - type: dropdown
     id: region
     attributes:
-      label: "Azure Region"
+      label: ">>>region<<<"
       description: "Choose the Azure region for this environment."
       options:
         - eastus
@@ -31,6 +31,6 @@ body:
   - type: textarea
     id: additional_notes
     attributes:
-      label: "Additional Notes"
-      description: "Add any specific requirements or notes for this environment (optional)."
-      placeholder: "Enter any additional information here."
+      label: ">>>additional_notes<<<"
+      description: "Add any specific requirements or notes (optional)."
+      placeholder: "Enter additional information here."
