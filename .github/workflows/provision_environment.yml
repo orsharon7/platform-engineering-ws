@@ -12,42 +12,35 @@ jobs:
         if: contains(github.event.issue.labels.*.name, 'environment-request')
         run: echo "Environment request detected"
 
-      - name: Issue Form Body Parser
-        uses: peter-murray/issue-forms-body-parser@v4.2.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          issue_id: ${{ github.event.issue.number }}
-          separator: '###'
-          label_marker_start: '>>'
-          label_marker_end: '<<'
-
       - name: Set up Azure CLI with Azure Login v2
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Set Environment Variables
-        id: set_env_vars
+      - name: Parse Issue Details
+        id: parse_issue
         run: |
-          # Extract parsed values
-          app_name="${{ fromJson(steps.parse_body.outputs.payload).app_name }}"
-          region="${{ fromJson(steps.parse_body.outputs.payload).region }}"
+          # Extract fields from issue body
+          app_name=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>app_name<<\n\n).*')
+          region=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>region<<\n\n).*')
+          additional_notes=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>additional_notes<<\n\n).*')
           
           # Generate unique ID based on issue number and timestamp
           unique_id="${{ github.event.issue.number }}-$(date +%s)"
           
-          # Validate required fields
-          if [[ -z "$app_name" || -z "$region" ]]; then
-            echo "Error: Missing required field(s): app_name or region." >&2
+          # Set environment variables if values are extracted successfully
+          if [[ -n "$app_name" && -n "$region" ]]; then
+            echo "app_name=$app_name" >> $GITHUB_ENV
+            echo "region=$region" >> $GITHUB_ENV
+            echo "unique_id=$unique_id" >> $GITHUB_ENV
+            echo "resource_group_name=env-$app_name-$unique_id-rg" >> $GITHUB_ENV
+            echo "additional_notes=$additional_notes" >> $GITHUB_ENV
+          else
+            echo "Error: Failed to parse issue details." >&2
             exit 1
           fi
 
-          # Set environment variables
-          echo "app_name=$app_name" >> $GITHUB_ENV
-          echo "region=$region" >> $GITHUB_ENV
-          echo "unique_id=$unique_id" >> $GITHUB_ENV
-          echo "resource_group_name=env-$app_name-$unique_id-rg" >> $GITHUB_ENV
-
+      # Continue with the rest of your steps
       - name: Create Resource Group with Tags
         run: |
           az group create --name "${{ env.resource_group_name }}" --location "${{ env.region }}" \
@@ -58,26 +51,4 @@ jobs:
                    "Environment=development"
         continue-on-error: true
 
-      - name: Deploy Application Infrastructure
-        env:
-          RESOURCE_GROUP: ${{ env.resource_group_name }}
-          REGION: ${{ env.region }}
-          UNIQUE_ID: ${{ env.unique_id }}
-        run: |
-          az deployment group create --resource-group "${{ env.RESOURCE_GROUP }}" \
-            --template-file template.json \
-            --parameters location=${{ env.REGION }} \
-                        appServicePlanName="appService-${{ env.UNIQUE_ID }}" \
-                        webAppName="webapp-${{ env.UNIQUE_ID }}"
-
-      - name: Get Application URL
-        id: get_app_url
-        run: |
-          APP_URL=$(az webapp show --name "webapp-${{ env.unique_id }}" --resource-group "${{ env.resource_group_name }}" --query defaultHostName -o tsv)
-          echo "APP_URL=${APP_URL}" >> $GITHUB_ENV
-
-      - name: Comment on Issue with Environment Details
-        run: |
-          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d '{"body": "Environment for `${{ env.app_name }}` is ready! Access it [here](http://${{ env.APP_URL }})"}' \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
+      # Additional deployment steps...
