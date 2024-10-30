@@ -12,31 +12,38 @@ jobs:
         if: contains(github.event.issue.labels.*.name, 'environment-request')
         run: echo "Environment request detected"
 
+      - name: Parse Issue Body
+        id: parse_body
+        uses: peter-murray/issue-forms-body-parser@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up Azure CLI with Azure Login v2
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Parse Issue Details
-        id: parse_issue
+      - name: Set Environment Variables
+        id: set_env_vars
         run: |
-          # Extract app_name and region from the issue body text
-          app_name=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Application Name:\*\* ).*')
-          region=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Azure Region:\*\* ).*')
+          app_name="${{ steps.parse_body.outputs.app_name }}"
+          region="${{ steps.parse_body.outputs.region }}"
           
           # Generate unique ID based on issue number and timestamp
           unique_id="${{ github.event.issue.number }}-$(date +%s)"
           
-          # Set environment variables if values are extracted successfully
-          if [[ -n "$app_name" && -n "$region" ]]; then
-            echo "app_name=$app_name" >> $GITHUB_ENV
-            echo "region=$region" >> $GITHUB_ENV
-            echo "unique_id=$unique_id" >> $GITHUB_ENV
-            echo "resource_group_name=env-$app_name-$unique_id-rg" >> $GITHUB_ENV
-          else
-            echo "Error: Failed to parse issue details." >&2
+          # Validate required fields
+          if [[ -z "$app_name" || -z "$region" ]]; then
+            echo "Error: Missing required field(s): app_name or region." >&2
             exit 1
           fi
+
+          # Set environment variables
+          echo "app_name=$app_name" >> $GITHUB_ENV
+          echo "region=$region" >> $GITHUB_ENV
+          echo "unique_id=$unique_id" >> $GITHUB_ENV
+          echo "resource_group_name=env-$app_name-$unique_id-rg" >> $GITHUB_ENV
 
       - name: Create Resource Group with Tags
         run: |
