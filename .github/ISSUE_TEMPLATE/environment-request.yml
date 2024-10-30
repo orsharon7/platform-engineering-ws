@@ -13,14 +13,14 @@ body:
   - type: input
     id: app_name
     attributes:
-      label: ">>>app_name<<<"
+      label: ">>app_name<<"
       description: "Provide the name of the application for this environment."
       placeholder: "e.g., my-app"
 
   - type: dropdown
     id: region
     attributes:
-      label: ">>>region<<<"
+      label: ">>region<<"
       description: "Choose the Azure region for this environment."
       options:
         - eastus
