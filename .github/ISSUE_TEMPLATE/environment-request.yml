@@ -1,20 +1,27 @@
+---
 name: "Request Development Environment"
 description: "Request a temporary environment for development or testing"
 title: "[Environment Request] {{app_name}}"
 labels: environment-request
+
 body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Request a Development Environment
+
   - type: input
     id: app_name
     attributes:
       label: "Application Name"
-      description: "Provide the application name to use for your environment"
+      description: "Provide the name of the application to use for this environment."
       placeholder: "e.g., my-app"
 
   - type: dropdown
     id: region
     attributes:
       label: "Azure Region"
-      description: "Select your Azure region for deployment"
+      description: "Choose the Azure region for this environment."
       options:
         - eastus
         - westeurope
@@ -24,6 +31,6 @@ body:
   - type: textarea
     id: additional_notes
     attributes:
-      label: "Any Additional Notes"
-      description: "Add any specific requirements or notes here (optional)"
-      placeholder: "Enter any additional information or requirements for this environment"
+      label: "Additional Notes"
+      description: "Add any specific requirements or notes for this environment (optional)."
+      placeholder: "Enter any additional information here."
