@@ -12,15 +12,14 @@ jobs:
         if: contains(github.event.issue.labels.*.name, 'environment-request')
         run: echo "Environment request detected"
 
-      - name: Parse Issue Body
-        id: parse_body
-        uses: peter-murray/issue-forms-body-parser@v4.0.0
+      - name: Issue Form Body Parser
+        uses: peter-murray/issue-forms-body-parser@v4.2.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           issue_id: ${{ github.event.issue.number }}
           separator: '###'
-          label_marker_start: '>>>'
-          label_marker_end: '<<<'
+          label_marker_start: '>>'
+          label_marker_end: '<<'
 
       - name: Set up Azure CLI with Azure Login v2
         uses: azure/login@v2
