@@ -31,6 +31,6 @@ body:
   - type: textarea
     id: additional_notes
     attributes:
-      label: ">>>additional_notes<<<"
+      label: ">>additional_notes<<"
       description: "Add any specific requirements or notes (optional)."
       placeholder: "Enter additional information here."
