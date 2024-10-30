@@ -1,1 +1,14 @@
+name: Check Issue Body Syntax
+on:
+  issues:
+    types: [opened]
 
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show Issue Body
+        run: |
+          echo "Issue title: ${{ github.event.issue.title }}"
+          echo "Issue body: ${{ github.event.issue.body }}"
