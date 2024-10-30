@@ -14,10 +14,13 @@ jobs:
 
       - name: Parse Issue Body
         id: parse_body
-        uses: peter-murray/issue-forms-body-parser@v1
+        uses: peter-murray/issue-forms-body-parser@v4.0.0
         with:
-          issue-number: ${{ github.event.issue.number }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_id: ${{ github.event.issue.number }}
+          separator: '###'
+          label_marker_start: '>>>'
+          label_marker_end: '<<<'
 
       - name: Set up Azure CLI with Azure Login v2
         uses: azure/login@v2
@@ -27,8 +30,9 @@ jobs:
       - name: Set Environment Variables
         id: set_env_vars
         run: |
-          app_name="${{ steps.parse_body.outputs.app_name }}"
-          region="${{ steps.parse_body.outputs.region }}"
+          # Extract parsed values
+          app_name="${{ fromJson(steps.parse_body.outputs.payload).app_name }}"
+          region="${{ fromJson(steps.parse_body.outputs.payload).region }}"
           
           # Generate unique ID based on issue number and timestamp
           unique_id="${{ github.event.issue.number }}-$(date +%s)"
