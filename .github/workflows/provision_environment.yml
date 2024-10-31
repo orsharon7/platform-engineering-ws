@@ -31,10 +31,6 @@ jobs:
       - name: Parse Issue Details
         id: parse_issue
         run: |
-          # Extract fields from the issue body using awk and handle empty lines
-      - name: Extract values from issue body
-        id: extract
-        run: |
           body="${{ github.event.issue.body }}"
           app_name=$(echo "$body" | awk '/>>app_name<</{getline; getline; print}')
           region=$(echo "$body" | awk '/>>region<</{getline; getline; print}')
@@ -42,25 +38,18 @@ jobs:
           echo "app_name=$app_name" >> $GITHUB_ENV
           echo "region=$region" >> $GITHUB_ENV
 
-          # Validate that app_name and region are non-empty
           if [[ -z "$app_name" || -z "$region" ]]; then
             echo "Error: Failed to parse issue details." >&2
             exit 1
           fi
       
-          # Generate unique ID based on issue number and timestamp
           unique_id="${{ github.event.issue.number }}-$(date +%s)"
-          
-      
-          # Create resource group name compliant with Azure restrictions
           resource_group_name="env-$app_name-$unique_id-rg"
-      
-          # Set environment variables
+
           echo "unique_id=$unique_id" >> $GITHUB_ENV
           echo "resource_group_name=$resource_group_name" >> $GITHUB_ENV
           echo "additional_notes=$additional_notes" >> $GITHUB_ENV
 
-          
       - name: Create Resource Group with Tags
         run: |
           az group create --name "${{ env.resource_group_name }}" --location "${{ env.region }}" \
@@ -69,12 +58,22 @@ jobs:
                    "Creation time=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
                    "App=${{ env.app_name }}" \
                    "Environment=development"
-        continue-on-error: false
+
+      - name: Deploy ARM Template
+        id: deploy_template
+        run: |
+          output=$(az deployment group create --resource-group "${{ env.resource_group_name }}" \
+            --template-file template.json \
+            --parameters location=${{ env.region }} \
+                        appServicePlanName="appService-${{ env.unique_id }}" \
+                        webAppName="${{ env.app_name }}-${{ env.unique_id }}" \
+            --query "properties.outputs.webAppUrl.value" -o tsv)
+          echo "webAppUrl=$output" >> $GITHUB_ENV
 
       - name: Comment on Issue to Indicate Completion
         run: |
           run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          comment="✅ Demo Environment request processing completed...\n\n Resource group name: `${{ env.resource_group_name }}` "
+          comment="✅ Demo Environment request processing completed...\n\nResource group name: `${{ env.resource_group_name }}`\nWeb App URL: [${{ env.webAppUrl }}](${ env.webAppUrl })"
           curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d "{\"body\": \"$comment\"}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
