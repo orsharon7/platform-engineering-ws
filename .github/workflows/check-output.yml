@@ -1,4 +1,5 @@
-name: Check Issue Body Syntax
+name: Output Issue Body Syntax
+run-name: Issue ${{ github.event.issue.title }} Body Syntax
 on:
   issues:
     types: [opened]
