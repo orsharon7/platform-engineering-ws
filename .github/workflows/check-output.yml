@@ -13,3 +13,17 @@ jobs:
         run: |
           echo "Issue title: ${{ github.event.issue.title }}"
           echo "Issue body: ${{ github.event.issue.body }}"
+
+      - name: Extract values from issue body
+        id: extract
+        run: |
+          body="${{ github.event.issue.body }}"
+          app_name=$(echo "$body" | grep -oP '(?<=>>app_name<<\n\n)[^\n]*')
+          region=$(echo "$body" | grep -oP '(?<=>>region<<\n)[^\n]*')
+          echo "app_name=$app_name" >> $GITHUB_ENV
+          echo "region=$region" >> $GITHUB_ENV
+
+      - name: Print extracted values
+        run: |
+          echo "App Name: ${{ env.app_name }}"
+          echo "Region: ${{ env.region }}"
