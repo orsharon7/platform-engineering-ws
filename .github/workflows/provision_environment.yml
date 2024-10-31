@@ -1,5 +1,5 @@
 name: Provision Environment on Issue Open
-run-name: Provision Environment on Issue ${{ github.event.issue.number }}
+run-name: Provision Environment on Issue ${{ github.event.issue.number }} for ${{ github.actor }}
 on:
   issues:
     types: [opened]
@@ -69,6 +69,12 @@ jobs:
                    "Creation time=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
                    "App=${{ env.app_name }}" \
                    "Environment=development"
-        continue-on-error: true
+        continue-on-error: false
 
-      # Additional deployment steps...
+      - name: Comment on Issue to Indicate Completion
+        run: |
+          run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          comment="✅ Demo Environment request processing completed...\n\n Resource group name: ${{ env.resource_group_name }} ."
+          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d "{\"body\": \"$comment\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
