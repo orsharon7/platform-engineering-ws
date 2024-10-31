@@ -30,9 +30,15 @@ jobs:
         id: parse_issue
         run: |
           # Extract fields from the issue body using awk and handle empty lines
-          app_name=$(echo "${{ github.event.issue.body }}" | awk -v RS="\n\n" '/### >>app_name<</ {getline; getline; print $0}' | xargs | tr -cd '[:alnum:]-_.()')
-          region=$(echo "${{ github.event.issue.body }}" | awk -v RS="\n\n" '/### >>region<</ {getline; getline; print $0}' | xargs | tr -cd '[:alnum:]-_.()')
-          additional_notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="\n\n" '/### >>additional_notes<</ {getline; getline; print $0}' | xargs)
+      - name: Extract values from issue body
+        id: extract
+        run: |
+          body="${{ github.event.issue.body }}"
+          app_name=$(echo "$body" | awk '/>>app_name<</{getline; getline; print}')
+          region=$(echo "$body" | awk '/>>region<</{getline; getline; print}')
+          additional_notes=$(echo "$body" | awk '/>>additional_notes<</{getline; getline; print}')
+          echo "app_name=$app_name" >> $GITHUB_ENV
+          echo "region=$region" >> $GITHUB_ENV
 
           # Validate that app_name and region are non-empty
           if [[ -z "$app_name" || -z "$region" ]]; then
@@ -48,8 +54,6 @@ jobs:
           resource_group_name="env-$app_name-$unique_id-rg"
       
           # Set environment variables
-          echo "app_name=$app_name" >> $GITHUB_ENV
-          echo "region=$region" >> $GITHUB_ENV
           echo "unique_id=$unique_id" >> $GITHUB_ENV
           echo "resource_group_name=$resource_group_name" >> $GITHUB_ENV
           echo "additional_notes=$additional_notes" >> $GITHUB_ENV
