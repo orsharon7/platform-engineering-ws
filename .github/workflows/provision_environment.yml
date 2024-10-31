@@ -21,11 +21,11 @@ jobs:
       - name: Parse Issue Details
         id: parse_issue
         run: |
-          # Extract fields from the issue body
-          app_name=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>app_name<<\s*\n\s*).*' | xargs)
-          region=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>region<<\s*\n\s*).*' | xargs)
-          additional_notes=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>additional_notes<<\s*\n\s*).*' | xargs)
-      
+          # Extract fields from the issue body using awk and handle empty lines
+          app_name=$(echo "${{ github.event.issue.body }}" | awk -v RS="\n\n" '/### >>app_name<</ {getline; getline; print $0}' | xargs)
+          region=$(echo "${{ github.event.issue.body }}" | awk -v RS="\n\n" '/### >>region<</ {getline; getline; print $0}' | xargs)
+          additional_notes=$(echo "${{ github.event.issue.body }}" | awk -v RS="\n\n" '/### >>additional_notes<</ {getline; getline; print $0}' | xargs)
+          
           # Generate unique ID based on issue number and timestamp
           unique_id="${{ github.event.issue.number }}-$(date +%s)"
           
@@ -41,6 +41,7 @@ jobs:
           echo "unique_id=$unique_id" >> $GITHUB_ENV
           echo "resource_group_name=env-$app_name-$unique_id-rg" >> $GITHUB_ENV
           echo "additional_notes=$additional_notes" >> $GITHUB_ENV
+
           
       - name: Create Resource Group with Tags
         run: |
