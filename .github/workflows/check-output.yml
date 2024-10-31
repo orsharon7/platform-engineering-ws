@@ -1,5 +1,5 @@
 name: Output Issue Body Syntax
-run-name: Issue # ${{ github.event.issue.nubmer }} Body Syntax
+run-name: Issue ${{ github.event.issue.nubmer }} Body Syntax
 on:
   issues:
     types: [opened]
