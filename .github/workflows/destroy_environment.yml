@@ -20,29 +20,28 @@ jobs:
       - name: Parse Issue Details
         id: parse_issue
         run: |
-          # Extract fields from the issue body using awk and handle empty lines
+          # Extract app_name from the issue body using awk
           body="${{ github.event.issue.body }}"
           app_name=$(echo "$body" | awk '/>>app_name<</{getline; getline; print}')
-          region=$(echo "$body" | awk '/>>region<</{getline; getline; print}')
-          additional_notes=$(echo "$body" | awk '/>>additional_notes<</{getline; getline; print}')
-          echo "app_name=$app_name" >> $GITHUB_ENV
-          echo "region=$region" >> $GITHUB_ENV
-          
-          
-          # Validate that app_name is non-empty
           if [[ -z "$app_name" ]]; then
             echo "Error: Failed to parse app_name." >&2
             exit 1
           fi
-
-          # Set environment variables
           echo "app_name=$app_name" >> $GITHUB_ENV
-          echo "unique_id=$unique_id" >> $GITHUB_ENV
-          echo "resource_group_name=$resource_group_name" >> $GITHUB_ENV
 
-      - name: Delete Resource Group
+      - name: Find and Delete Resource Group
         run: |
-          az group delete --name "${{ env.resource_group_name }}" --yes --no-wait
+          # Find the resource group by searching for the Issue ID tag
+          issue_url="https://github.com/${{ github.repository }}/issues/${{ github.event.issue.number }}"
+          resource_group_name=$(az group list --tag "Issue ID=$issue_url" --query "[0].name" -o tsv)
+          
+          if [[ -z "$resource_group_name" ]]; then
+            echo "Error: No resource group found with the specified Issue ID tag." >&2
+            exit 1
+          fi
+
+          # Delete the resource group
+          az group delete --name "$resource_group_name" --yes --no-wait
 
       - name: Comment on Issue with Cleanup Confirmation
         run: |
