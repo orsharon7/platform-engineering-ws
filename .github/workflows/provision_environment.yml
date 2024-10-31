@@ -18,7 +18,7 @@ jobs:
       - name: Comment on Issue to Indicate Provisioning
         run: |
           run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          comment="⚙️ Demo Environment request processing started...\n\nActions workflow extracting the demo definition run can be accessed from [here]($run_url)."
+          comment="⚙️ Demo Environment request processing started... \n\n Actions workflow extracting the demo definition run can be accessed from [here]($run_url)."
           curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d "{\"body\": \"$comment\"}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
@@ -72,7 +72,7 @@ jobs:
       - name: Comment on Issue to Indicate Completion
         run: |
           run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          comment="✅ Demo Environment request processing completed...\n\nResource group name: `${{ env.resource_group_name }}`\nWeb App URL: [${{ env.webAppUrl }}](${ env.webAppUrl })"
+          comment="✅ Demo Environment request processing completed...\n\n Resource group name: `${{ env.resource_group_name }}` \n Web App URL: [${{ env.webAppUrl }}](${ env.webAppUrl })"
           curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d "{\"body\": \"$comment\"}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
