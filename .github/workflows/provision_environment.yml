@@ -15,7 +15,14 @@ jobs:
       - name: Check if issue is an environment request
         if: contains(github.event.issue.labels.*.name, 'environment-request')
         run: echo "Environment request detected"
-            
+      - name: Comment on Issue to Indicate Provisioning
+        run: |
+          run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          comment="⚙️ Demo Environment request processing started...\n\nActions workflow extracting the demo definition run can be accessed from [here]($run_url)."
+          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d "{\"body\": \"$comment\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
+
       - name: Checkout repository
         uses: actions/checkout@v2
 
@@ -33,7 +40,6 @@ jobs:
           additional_notes=$(echo "$body" | awk '/>>additional_notes<</{getline; getline; print}')
           echo "app_name=$app_name" >> $GITHUB_ENV
           echo "region=$region" >> $GITHUB_ENV
-
           if [[ -z "$app_name" || -z "$region" ]]; then
             echo "Error: Failed to parse issue details." >&2
             exit 1
@@ -45,15 +51,6 @@ jobs:
           echo "unique_id=$unique_id" >> $GITHUB_ENV
           echo "resource_group_name=$resource_group_name" >> $GITHUB_ENV
           echo "additional_notes=$additional_notes" >> $GITHUB_ENV
-          
-      - name: Comment on Issue to Indicate Provisioning
-        run: |
-          run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          comment="👷🏼‍♂️ Demo Environment request processing started...\n\nActions workflow extracting the demo definition run can be accessed from [here]($run_url).\n\n Resource Group name: `${{ env.resource_group_name }}` ."
-          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d "{\"body\": \"$comment\"}" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
-
       - name: Create Resource Group with Tags
         run: |
           az group create --name "${{ env.resource_group_name }}" --location "${{ env.region }}" \
@@ -62,7 +59,6 @@ jobs:
                    "Creation time=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
                    "App=${{ env.app_name }}" \
                    "Environment=development"
-
       - name: Deploy ARM Template
         id: deploy_template
         run: |
@@ -73,7 +69,6 @@ jobs:
                         webAppName="${{ env.app_name }}-${{ env.unique_id }}" \
             --query "properties.outputs.webAppUrl.value" -o tsv)
           echo "webAppUrl=$output" >> $GITHUB_ENV
-
       - name: Comment on Issue to Indicate Completion
         run: |
           run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
