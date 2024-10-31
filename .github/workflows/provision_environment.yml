@@ -76,7 +76,8 @@ jobs:
       - name: Comment on Issue to Indicate Completion
         run: |
           run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          comment="✅ Demo Environment request processing completed...\n\nResource group name: `${{ env.resource_group_name }}`\nWeb App URL: [${{ env.webAppUrl }}](${{ env.webAppUrl }})\n\ncc: @${{ github.actor }}"
+          # Escape backticks and other special characters
+          comment="✅ Demo Environment request processing completed...\n\nResource group name: \\\`${{ env.resource_group_name }}\\\`\nWeb App URL: [${{ env.webAppUrl }}](${{ env.webAppUrl }})\n\ncc: @${{ github.actor }}"
           comment_escaped=$(echo "$comment" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
           curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d "{\"body\": \"$comment_escaped\"}" \
