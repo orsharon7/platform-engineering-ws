@@ -13,6 +13,14 @@ jobs:
         if: contains(github.event.issue.labels.*.name, 'environment-request')
         run: echo "Environment request detected"
 
+      - name: Comment on Issue to Indicate Provisioning
+        run: |
+          run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          comment="⚙️ Demo Environment request processing started...\n\n[Actions workflow extracting the demo definition run can be accessed from here]($run_url)."
+          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d "{\"body\": \"$comment\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
+
       - name: Set up Azure CLI with Azure Login v2
         uses: azure/login@v2
         with:
