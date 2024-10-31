@@ -72,25 +72,12 @@ jobs:
                         webAppName="${{ env.app_name }}-${{ env.unique_id }}" \
             --query "properties.outputs.webAppUrl.value" -o tsv)
           echo "webAppUrl=$output" >> $GITHUB_ENV
-          
-      - name: Set job outputs
-        id: set_outputs
-        run: |
-          echo "::set-output name=resource_group_name::${{ env.resource_group_name }}"
-          echo "::set-output name=webAppUrl::${{ env.webAppUrl }}"
-          echo "::set-output name=github_actor::${{ github.actor }}"
 
-  comment:
-    needs: provision
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-
-    steps:
       - name: Comment on Issue to Indicate Completion
         run: |
           run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          comment="✅ Demo Environment request processing completed...\n\nResource group name: `${{ needs.provision.outputs.resource_group_name }}`\nWeb App URL: [${{ needs.provision.outputs.webAppUrl }}](${ needs.provision.outputs.webAppUrl })\n\ncc: @${{ needs.provision.outputs.github_actor }}"
+          comment="✅ Demo Environment request processing completed...\n\nResource group name: `${{ env.resource_group_name }}`\nWeb App URL: [${{ env.webAppUrl }}](${ env.webAppUrl })\n\ncc: @${{ github.actor }}"
+          comment_escaped=$(echo "$comment" | sed 's/"/\\"/g' | sed 's/$/\\n/' | tr -d '\n')
           curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d "{\"body\": \"${comment//$'\n'/\\n}\"}" \
+            -d "{\"body\": \"$comment_escaped\"}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
