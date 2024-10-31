@@ -21,27 +21,27 @@ jobs:
       - name: Parse Issue Details
         id: parse_issue
         run: |
-          # Extract fields from issue body
-          app_name=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>app_name<<\n\n).*')
-          region=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>region<<\n\n).*')
-          additional_notes=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>additional_notes<<\n\n).*')
-          
+          # Extract fields from the issue body
+          app_name=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>app_name<<\s*\n\s*).*' | xargs)
+          region=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>region<<\s*\n\s*).*' | xargs)
+          additional_notes=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=### >>additional_notes<<\s*\n\s*).*' | xargs)
+      
           # Generate unique ID based on issue number and timestamp
           unique_id="${{ github.event.issue.number }}-$(date +%s)"
           
-          # Set environment variables if values are extracted successfully
-          if [[ -n "$app_name" && -n "$region" ]]; then
-            echo "app_name=$app_name" >> $GITHUB_ENV
-            echo "region=$region" >> $GITHUB_ENV
-            echo "unique_id=$unique_id" >> $GITHUB_ENV
-            echo "resource_group_name=env-$app_name-$unique_id-rg" >> $GITHUB_ENV
-            echo "additional_notes=$additional_notes" >> $GITHUB_ENV
-          else
+          # Validate that app_name and region are non-empty
+          if [[ -z "$app_name" || -z "$region" ]]; then
             echo "Error: Failed to parse issue details." >&2
             exit 1
           fi
-
-      # Continue with the rest of your steps
+      
+          # Set environment variables
+          echo "app_name=$app_name" >> $GITHUB_ENV
+          echo "region=$region" >> $GITHUB_ENV
+          echo "unique_id=$unique_id" >> $GITHUB_ENV
+          echo "resource_group_name=env-$app_name-$unique_id-rg" >> $GITHUB_ENV
+          echo "additional_notes=$additional_notes" >> $GITHUB_ENV
+          
       - name: Create Resource Group with Tags
         run: |
           az group create --name "${{ env.resource_group_name }}" --location "${{ env.region }}" \
