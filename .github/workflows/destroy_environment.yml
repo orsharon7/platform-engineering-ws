@@ -6,6 +6,8 @@ on:
 jobs:
   destroy:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
 
     steps:
       - name: Check if issue is an environment request
