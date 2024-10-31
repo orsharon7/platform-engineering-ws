@@ -1,4 +1,5 @@
 name: Provision Environment on Issue Open
+run-name: Provision Environment on Issue ${{ github.event.issue.number }}
 on:
   issues:
     types: [opened]
