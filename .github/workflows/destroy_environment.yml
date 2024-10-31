@@ -21,9 +21,13 @@ jobs:
         id: parse_issue
         run: |
           # Extract fields from the issue body using awk and handle empty lines
-          app_name=$(echo "${{ github.event.issue.body }}" | awk -v RS="\n\n" '/### >>app_name<</ {getline; getline; print $0}' | xargs)
-          unique_id="${{ github.event.issue.number }}-$(date +%s)"
-          resource_group_name="env-$app_name-$unique_id-rg"
+          body="${{ github.event.issue.body }}"
+          app_name=$(echo "$body" | awk '/>>app_name<</{getline; getline; print}')
+          region=$(echo "$body" | awk '/>>region<</{getline; getline; print}')
+          additional_notes=$(echo "$body" | awk '/>>additional_notes<</{getline; getline; print}')
+          echo "app_name=$app_name" >> $GITHUB_ENV
+          echo "region=$region" >> $GITHUB_ENV
+          
           
           # Validate that app_name is non-empty
           if [[ -z "$app_name" ]]; then
