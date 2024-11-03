@@ -78,6 +78,7 @@ Here's an overview of the project structure:
 ## How It Works
 
 ### Opening an Issue
+**File:** [environment-request.yml](.github/ISSUE_TEMPLATE/environment-request.yml)
 
 The workflow starts when an engineer opens an issue using the `environment-request.yml` template in `.github/ISSUE_TEMPLATE`. The template gathers key details such as the application name and Azure region in a standardized format:
 
@@ -95,6 +96,8 @@ The workflow starts when an engineer opens an issue using the `environment-reque
 ```
 
 ### Provisioning Environments
+**File:** [provision_environment.yml](.github/workflows/provision_environment.yml)
+
 When the issue is labeled `environment-request`, the `provision_environment.yml` workflow is triggered. This workflow automates environment setup:
 
 1. **Parsing Issue Details:** Extracts the app name and region using `awk`:
@@ -120,6 +123,8 @@ output=$(az deployment group create --resource-group "${{ env.resource_group_nam
 ```
 
 ### Destroying Environments
+**File:** [destroy_environment.yml](.github/workflows/destroy_environment.yml)
+
 Closing an issue triggers the destroy_environment.yml workflow, automating resource cleanup:
 
 1. **Locating the Resource Group:** Identifies the resource group by its tags:
@@ -141,7 +146,9 @@ az group delete --name "$resource_group_name" --yes --no-wait
 To get started with this workshop:
 
 1. Clone the repository.
-2. Set up the necessary secrets in your GitHub repository (e.g., `AZURE_CREDENTIALS`).
+2. Set up the necessary secrets in your GitHub repository for the **Azure Login Action** (e.g., `AZURE_CREDENTIALS`):
+    - 2.1. [Azure Login Action Doc](https://github.com/marketplace/actions/azure-login)
+    - 2.2. [Use the Azure Login action with a client secret](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-secret)
 3. Open a new issue using the `environment-request` template.
 4. Monitor the GitHub Actions workflows to see the provisioning and cleanup processes in action.
 
