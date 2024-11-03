@@ -5,15 +5,17 @@ Welcome to the Platform Engineering Workshop! This workshop is designed to help 
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Benefits of Platform Engineering](#benefits-of-platform-engineering)
-3. [Workshop Overview](#workshop-overview)
-4. [The Three Layers of Platform Engineering](#the-three-layers-of-platform-engineering)
-5. [How It Works](#how-it-works)
+2. [Why We Need Platform Engineering](#why-we-need-platform-engineering)
+3. [Benefits of Platform Engineering](#benefits-of-platform-engineering)
+4. [Workshop Overview](#workshop-overview)
+5. [Project Structure](#project-structure)
+6. [How It Works](#how-it-works)
     - [Opening an Issue](#opening-an-issue)
     - [Provisioning Environments](#provisioning-environments)
     - [Destroying Environments](#destroying-environments)
-6. [Getting Started](#getting-started)
-7. [Conclusion](#conclusion)
+    - [Checking Output](#checking-output)
+7. [Getting Started](#getting-started)
+8. [Conclusion](#conclusion)
 
 ## Introduction
 
