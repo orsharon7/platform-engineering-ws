@@ -82,7 +82,7 @@ In this workshop, you will learn how to:
 
 ## How It Works
 
-### Opening an Issue
+### 1. Opening an Issue
 **File:** [environment-request.yml](.github/ISSUE_TEMPLATE/environment-request.yml)
 
 The workflow starts when an engineer opens an issue using the `environment-request.yml` template in `.github/ISSUE_TEMPLATE`. The template gathers key details such as the application name and Azure region in a standardized format:
@@ -113,7 +113,7 @@ Issue templates ensure a consistent and standardized way to collect necessary de
 The `>> <<` marks are used as identifiers to extract data from the issue body. For example, `>>app_name<<` is parsed to automate environment setup, ensuring easy and reliable data retrieval.
 
 
-### Provisioning Environments
+### 2. Provisioning Environments
 **File:** [provision_environment.yml](.github/workflows/provision_environment.yml)
 
 When the issue is labeled `environment-request`, the `provision_environment.yml` workflow is triggered. This workflow automates environment setup using GitHub Actions, a powerful automation tool that allows you to create custom workflows directly in your GitHub repository.
@@ -140,7 +140,7 @@ output=$(az deployment group create --resource-group "${{ env.resource_group_nam
   --query "properties.outputs.webAppUrl.value" -o tsv)
 ```
 
-### Destroying Environments
+### 3. Destroying Environments
 **File:** [destroy_environment.yml](.github/workflows/destroy_environment.yml)
 
 Closing an issue triggers the destroy_environment.yml workflow, automating resource cleanup:
