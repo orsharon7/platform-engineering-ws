@@ -2,7 +2,7 @@
 name: "Request Development Environment"
 description: "Request a temporary environment for development or testing"
 title: "Environment Request - Dev"
-labels: environment-request
+label: environment-request
 
 body:
   - type: markdown
