@@ -74,16 +74,6 @@ In this workshop, you will learn how to:
 2. Deploy infrastructure as code using Azure Resource Manager (ARM) templates.
 3. Automate environment cleanup to ensure resource efficiency.
 
-## Project Structure
-
-Here's an overview of the project structure:
-
-- **.github/ISSUE_TEMPLATE**: Contains the template for requesting development environments.
-- **.github/workflows**: Contains GitHub Actions workflows for provisioning and destroying environments.
-- **infra/**: Contains the ARM template for deploying infrastructure.
-- **app/**: Placeholder for application code.
-- **README.md**: This document.
-
 ## How It Works
 
 ### Opening an Issue
@@ -103,6 +93,19 @@ The workflow starts when an engineer opens an issue using the `environment-reque
     label: ">>region<<"
     options: [eastus, westeurope, southeastasia, centralus]
 ```
+
+#### How Issue Templates Help in Platform Engineering
+
+Issue templates ensure a consistent and standardized way to collect necessary details for automating environment provisioning, reducing errors, and boosting efficiency. They help by:
+
+- **Standardizing Requests**: Ensures all required information is provided for automation.
+- **Reducing Errors**: Minimizes misconfigurations and missing details.
+- **Improving Efficiency**: Streamlines provisioning, freeing up engineers for development work.
+
+#### Explanation of `>> <<` Marks
+
+The `>> <<` marks are used as identifiers to extract data from the issue body. For example, `>>app_name<<` is parsed to automate environment setup, ensuring easy and reliable data retrieval.
+
 
 ### Provisioning Environments
 **File:** [provision_environment.yml](.github/workflows/provision_environment.yml)
