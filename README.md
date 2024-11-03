@@ -11,7 +11,6 @@ Welcome to the Platform Engineering Workshop! This workshop is designed to help 
 5. [How It Works](#how-it-works)
     - [Provisioning Environments](#provisioning-environments)
     - [Destroying Environments](#destroying-environments)
-    - [Checking Output](#checking-output)
     - [Opening an Issue](#opening-an-issue)
 6. [Getting Started](#getting-started)
 7. [Conclusion](#conclusion)
