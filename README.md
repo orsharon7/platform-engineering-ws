@@ -29,7 +29,7 @@ This transformation highlights the essence of platform engineering: removing bot
 
 ### How it looks like?
 <div style="text-align: center;">
-    <img src="./assets/Workflow-Execution.png" alt="Issue Execution" style="width: 25%;">
+    <img src="./assets/Workflow-Execution.png" alt="Issue Execution" style="width: 50%;">
 </div>
 
 
