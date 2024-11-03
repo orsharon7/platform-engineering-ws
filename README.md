@@ -110,7 +110,7 @@ The `>> <<` marks are used as identifiers to extract data from the issue body. F
 ### Provisioning Environments
 **File:** [provision_environment.yml](.github/workflows/provision_environment.yml)
 
-When the issue is labeled `environment-request`, the `provision_environment.yml` workflow is triggered. This workflow automates environment setup:
+When the issue is labeled `environment-request`, the `provision_environment.yml` workflow is triggered. This workflow automates environment setup using GitHub Actions, a powerful automation tool that allows you to create custom workflows directly in your GitHub repository.
 
 1. **Parsing Issue Details:** Extracts the app name and region using `awk`:
 
