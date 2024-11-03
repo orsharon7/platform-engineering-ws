@@ -7,7 +7,7 @@ Welcome to the Platform Engineering Workshop! This workshop is designed to help 
 1. [Introduction](#introduction)
 2. [Benefits of Platform Engineering](#benefits-of-platform-engineering)
 3. [Workshop Overview](#workshop-overview)
-4. [Project Structure](#project-structure)
+4. [The Three Layers of Platform Engineering](#the-three-layers-of-platform-engineering)
 5. [How It Works](#how-it-works)
     - [Opening an Issue](#opening-an-issue)
     - [Provisioning Environments](#provisioning-environments)
@@ -48,19 +48,19 @@ This transformation highlights the essence of platform engineering: removing bot
 Platform engineering delivers efficient, automated workflows through three essential layers: Infrastructure as Code (IaC), Actions, and Deployment.
 ![PE-Layer](assets/PE-Layers.png)
 
-### 1. **Infrastructure as Code (IaC) Layer**
-   The foundation of a robust platform: this layer uses code to define and manage infrastructure. Tools like Terraform, ARM templates, and Pulumi automate resource provisioning, making it scalable and consistent.<br>
-   - **Examples**:
-     - Automating network and database setup with Terraform.
-     - Using ARM templates to ensure uniform infrastructure across environments.
-     - Version-controlling cloud policies for consistent security.
-
-### 2. **Actions Layer**
+### 1. **Actions Layer**
    The automation hub: this layer focuses on orchestrating CI/CD workflows, testing, and deployment triggers. GitHub Actions and Jenkins streamline the build and release processes, ensuring efficient software delivery.<br>
    - **Examples**:
      - Automatically running infrastructure checks with GitHub Actions.
      - Integrating quality assurance tests in every code commit.
      - Coordinating complex deployment workflows to multiple environments.
+
+### 2. **Infrastructure as Code (IaC) Layer**
+   The foundation of a robust platform: this layer uses code to define and manage infrastructure. Tools like Terraform, ARM templates, and Pulumi automate resource provisioning, making it scalable and consistent.<br>
+   - **Examples**:
+     - Automating network and database setup with Terraform.
+     - Using ARM templates to ensure uniform infrastructure across environments.
+     - Version-controlling cloud policies for consistent security.
 
 ### 3. **Deployment Layer**
    Where software goes live: this layer ensures applications are deployed securely and efficiently using technologies like Helm, Azure App Services, and Docker. It focuses on making deployments fast, reliable, and easily manageable.<br>
