@@ -4,7 +4,17 @@ Welcome to the Platform Engineering Workshop! This workshop is designed to help 
 
 ## Table of Contents
 
-[TOC]
+1. [Introduction](#introduction)
+2. [Benefits of Platform Engineering](#benefits-of-platform-engineering)
+3. [Workshop Overview](#workshop-overview)
+4. [Project Structure](#project-structure)
+5. [How It Works](#how-it-works)
+    - [Provisioning Environments](#provisioning-environments)
+    - [Destroying Environments](#destroying-environments)
+    - [Checking Output](#checking-output)
+    - [Opening an Issue](#opening-an-issue)
+6. [Getting Started](#getting-started)
+7. [Conclusion](#conclusion)
 
 ## Introduction
 
