@@ -27,6 +27,11 @@ Now, with platform engineering, everything changes. Alex uses a self-service pla
 
 This transformation highlights the essence of platform engineering: removing bottlenecks, empowering developers, and accelerating the software delivery lifecycle.
 
+### How it looks like?
+<div style="text-align: center;">
+    <img src="./assets/Workflow-Execution.png" alt="Issue Execution" style="width: 25%;">
+</div>
+
 
 ## Benefits of Platform Engineering
 
