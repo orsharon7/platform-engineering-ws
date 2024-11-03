@@ -41,6 +41,7 @@ This transformation highlights the essence of platform engineering: removing bot
 ## The Three Layers of Platform Engineering
 
 Platform engineering delivers efficient, automated workflows through three essential layers: Infrastructure as Code (IaC), Actions, and Deployment.
+![PE-Layer](assets/PE-Layers.png)
 
 ### 1. **Infrastructure as Code (IaC) Layer**
    The foundation of a robust platform: this layer uses code to define and manage infrastructure. Tools like Terraform, ARM templates, and Pulumi automate resource provisioning, making it scalable and consistent.<br>
