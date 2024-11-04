@@ -166,9 +166,13 @@ az group delete --name "$resource_group_name" --yes --no-wait
 To get started with this workshop:
 
 1. Clone the repository.
-2. Set up the necessary secrets in your GitHub repository for the **Azure Login Action** (e.g., `AZURE_CREDENTIALS`):
-    - 2.1. [Azure Login Action Doc](https://github.com/marketplace/actions/azure-login)
-    - 2.2. [Use the Azure Login action with a client secret](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-secret)
+2. Set up the necessary secrets in your GitHub repository for the **Azure Login Action**:
+  When generating your credentials (in this example we store in a secret named `AZURE_CREDENTIALS`) you will need to specify a scope at the subscription level.
+  ```bash
+  az ad sp create-for-rbac --name "{sp-name}" --sdk-auth --role contributor --scopes /subscriptions/{subscription-id}
+  ```
+  - 2.1. [Azure Login Action Doc](https://github.com/marketplace/actions/azure-login)
+  - 2.2. [Use the Azure Login action with a client secret](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-secret)
 3. Open a new issue using the `environment-request` template.
 4. Monitor the GitHub Actions workflows to see the provisioning and cleanup processes in action.
 
