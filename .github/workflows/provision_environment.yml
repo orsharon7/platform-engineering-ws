@@ -6,26 +6,43 @@ on:
 
 jobs:
   provision:
+    if: |
+      contains(github.event.issue.labels.*.name, 'environment-request') && (
+        contains(github.event.issue.labels.*.name, 'aks') ||
+        contains(github.event.issue.labels.*.name, 'app-service')
+      )
     runs-on: ubuntu-latest
     permissions:
       issues: write
       contents: read
 
     steps:
-      - name: Check if issue is an environment request
-        if: contains(github.event.issue.labels.*.name, 'environment-request')
-        run: echo "Environment request detected"
-        
-      - name: Comment on Issue to Indicate Provisioning
+      - name: Determine Environment Requested
+        id: get-env
         run: |
-          run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          comment="⚙️ Demo Environment request processing started... \n\nActions workflow extracting the demo definition run can be accessed from [here]($run_url)."
-          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d "{\"body\": \"$comment\"}" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
+          if [[ "${{ github.event.issue.labels[*].name }}" == *"aks"* ]]; then
+            echo "environment=aks" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.issue.labels[*].name }}" == *"app-service"* ]]; then
+            echo "environment=app-service" >> $GITHUB_OUTPUT
+          fi
 
+      - name: Echo Environment Requested
+        run: |
+          echo "Requested environment: ${{ steps.get-env.outputs.environment }}"
+  
+      - name: Comment on the Issue
+        uses: actions/github-script@v7.0.1
+        with:
+          script: |
+            const result = await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `⚙️ Provisioning **${{ steps.get-env.outputs.environment }}** dev environment...`
+            })
+        
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Azure CLI with Azure Login v2
         uses: azure/login@v2
@@ -60,25 +77,35 @@ jobs:
                    "Issue ID=https://github.com/${{ github.repository }}/issues/${{ github.event.issue.number }}" \
                    "Creation time=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
                    "App=${{ env.app_name }}" \
-                   "Environment=development"
-                   
+                   "Environment=${{ steps.get-env.outputs.environment }} Dev Environment"
+               
       - name: Deploy ARM Template
-        id: deploy_template
+        id: deploy
+        uses: azure/arm-deploy@v2
+        with:
+          resource-group: ${{ env.resource_group_name }}
+          template: ./infra/${{ steps.get-env.outputs.environment }}-template.json
+          parameters: |
+            location=${{ env.region }}
+            uniqueId=${{ env.unique_id }}
+          deploymentName: ${{ github.actor }}-${{ steps.get-env.outputs.environment }}-deployment
+
+      - name: Capture ARM Template Outputs
+        id: capture_outputs
         run: |
-          output=$(az deployment group create --resource-group "${{ env.resource_group_name }}" \
-            --template-file infra/template.json \
-            --parameters location=${{ env.region }} \
-                        appServicePlanName="appService-${{ env.unique_id }}" \
-                        webAppName="${{ env.app_name }}-${{ env.unique_id }}" \
-            --query "properties.outputs.webAppUrl.value" -o tsv)
-          echo "webAppUrl=$output" >> $GITHUB_ENV
+          echo "outputs=$(echo '${{ toJson(steps.deploy.outputs) }}')" >> $GITHUB_ENV
 
       - name: Comment on Issue to Indicate Completion
-        run: |
-          run_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          # Properly escape backticks and special characters
-          comment="✅ Demo Environment request processing completed...\\n\\nResource group name: \`${{ env.resource_group_name }}\`\\nWeb App URL: [${{ env.webAppUrl }}](${{ env.webAppUrl }})\\n\\ncc: @${{ github.actor }}"
-          comment_escaped=$(echo "$comment" | sed 's/"/\\"/g')
-          curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d "{\"body\": \"$comment_escaped\"}" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
+        uses: actions/github-script@v7.0.1
+        with:
+          script: |
+            const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            const outputs = JSON.parse(process.env.outputs);
+            const outputEntries = Object.entries(outputs).map(([key, value]) => `${key}: ${value}`).join('\\n');
+            const comment = `✅ Demo Environment request processing completed...\\n\\nResource group name: \`${{ env.resource_group_name }}\`\\nOutputs:\\n${outputEntries}\\n\\ncc: @${{ github.actor }}`;
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
