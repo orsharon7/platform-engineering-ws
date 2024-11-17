@@ -30,4 +30,5 @@ Feel free to go through the documentation to get more insights on GitHub and its
 
 ---
 
-Click on "Next" from the bottom right to start with the lab.
+## Next Module: [Introduction to GitHub Actions](lab/02_introduction_to_github_actions.md)
+
