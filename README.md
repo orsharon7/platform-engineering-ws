@@ -177,3 +177,6 @@ To get started with this workshop:
 By the end of this workshop, you will have a solid understanding of platform engineering principles and practical experience with automating infrastructure provisioning and management using GitHub Actions and ARM templates.
 
 Happy learning!
+
+## Next Module: [Introduction to GitHub](lab/01_introduction_to_github.md)
+
