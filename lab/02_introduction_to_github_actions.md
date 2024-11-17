@@ -37,4 +37,4 @@ For more detailed information, refer to the [GitHub Actions documentation](https
 
 ---
 
-Click on "Next" from the bottom right to start with the lab.
+## Next Module: [Getting Started with Your Lab](lab/03_getting_started_with_your_lab.md)
